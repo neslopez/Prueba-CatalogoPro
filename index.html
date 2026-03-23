@@ -28,12 +28,7 @@
 </div>
 </header>
 
-
-
-<!-- CONFIGURACION NEGOCIO -->
-
 <section class="config-negocio no-imprimir">
-
 <div class="config-box">
 
 <label>Nombre del negocio</label>
@@ -45,26 +40,19 @@
 <img id="previewLogo" class="logo-preview">
 
 </div>
-
 </section>
-
-
 
 <nav class="controls no-imprimir">
 
 <div class="left-controls">
 
-<button id="btnAgregar" class="btn primary" disabled>➕ Nuevo Producto</button>
+<button id="btnAgregar" class="btn primary">➕ Nuevo Producto</button>
 
-<label class="small">Categoría</label>
+<label>Categoría</label>
 
 <div class="cat-row">
 
-<select id="filtroCategoria" class="select">
-<option value="todas">Todas las categorías</option>
-<option value="destacados">Destacados</option>
-<option value="ofertas">Ofertas</option>
-</select>
+<select id="filtroCategoria" class="select"></select>
 
 <input id="nuevaCategoria" placeholder="Agregar categoría" class="input-small"/>
 
@@ -75,10 +63,9 @@ Agregar
 </div>
 </div>
 
-
 <div class="right-controls">
 
-<label class="small">Ordenar</label>
+<label>Ordenar</label>
 
 <select id="orden" class="select">
 <option value="default">Por defecto</option>
@@ -99,7 +86,6 @@ Agregar
 </div>
 
 </nav>
-
 
 <main>
 
@@ -131,47 +117,31 @@ Agregar
 
 </main>
 
-
-
-<!-- MODAL -->
-
-<div id="modal" class="modal oculto" aria-hidden="true">
+<div id="modal" class="modal oculto">
 
 <div class="modal-contenido">
 
-<h2 id="modalTitulo">Agregar producto</h2>
+<h2>Agregar producto</h2>
 
-<label>Nombre</label>
-<input id="nombre" type="text" class="input"/>
-
-<label>Precio</label>
-<input id="precio" type="number" class="input"/>
-
-<label>Categoría</label>
+<input id="nombre" placeholder="Nombre" class="input"/>
+<input id="precio" type="number" placeholder="Precio" class="input"/>
 <select id="categoria" class="input"></select>
 
-<label>Imagen</label>
-<input id="imagen" type="file" accept="image/*"/>
+<input id="imagen" type="file"/>
 <img id="preview" class="preview">
 
-<div class="checks">
 <label><input id="destacado" type="checkbox"> Destacado</label>
 <label><input id="oferta" type="checkbox"> Oferta</label>
-</div>
 
-<div class="modal-actions">
 <button id="guardar" class="btn primary">Guardar</button>
 <button id="cancelar" class="btn outline">Cancelar</button>
-</div>
 
 </div>
 </div>
-
 
 <footer class="footer no-imprimir">
 <small>CatálogoFácil PRO — Hecho por Ezequiel</small>
 </footer>
-
 
 <script src="script.js"></script>
 
