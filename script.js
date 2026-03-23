@@ -1,4 +1,4 @@
-/* script.js - CatálogoFácil PRO mejorado */
+/* script.js - versión limpia */
 
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 let categorias = JSON.parse(localStorage.getItem("categorias")) || [];
@@ -34,13 +34,11 @@ const statOfertas = $("statOfertas");
 const statDestacados = $("statDestacados");
 const statCategorias = $("statCategorias");
 
-/* DATOS NEGOCIO */
-
 const inputNombreNegocio = $("nombreNegocio");
 const inputLogoNegocio = $("logoNegocio");
 const previewLogo = $("previewLogo");
 
-/* ---------- UTILIDADES ---------- */
+/* ---------- UTIL ---------- */
 
 function saveState(){
   localStorage.setItem("productos",JSON.stringify(productos));
@@ -51,172 +49,108 @@ function mostrarAlerta(msg){
   alert(msg);
 }
 
-/* ✅ VALIDACIÓN REAL */
+/* 🔥 VALIDACIÓN SIMPLE Y REAL */
 function negocioConfigurado(){
-  return inputNombreNegocio?.value.trim() !== "" && categorias.length > 0;
+  return inputNombreNegocio?.value.trim() !== "";
 }
 
-/* ---------- INICIO ---------- */
+/* ---------- INIT ---------- */
 
 document.addEventListener("DOMContentLoaded",()=>{
-
-  if(!Array.isArray(productos)) productos=[];
-  if(!Array.isArray(categorias)) categorias=[];
 
   poblarFiltros();
   renderProductos(productos);
   actualizarStats();
 
-  /* CARGAR DATOS NEGOCIO */
+  /* cargar negocio */
 
   const nombreGuardado = localStorage.getItem("nombreNegocio");
   const logoGuardado = localStorage.getItem("logoNegocio");
 
-  if(inputNombreNegocio && nombreGuardado){
-    inputNombreNegocio.value = nombreGuardado;
-  }
+  if(nombreGuardado) inputNombreNegocio.value = nombreGuardado;
+  if(logoGuardado) previewLogo.src = logoGuardado;
 
-  if(previewLogo && logoGuardado){
-    previewLogo.src = logoGuardado;
-  }
-
-  actualizarBoton();
-
-  /* GUARDAR NOMBRE */
+  /* guardar negocio */
 
   inputNombreNegocio?.addEventListener("input",()=>{
     localStorage.setItem("nombreNegocio",inputNombreNegocio.value);
-    actualizarBoton();
   });
 
-  inputNombreNegocio?.addEventListener("change",actualizarBoton);
-
-  /* GUARDAR LOGO */
-
   inputLogoNegocio?.addEventListener("change",(e)=>{
-
     const file = e.target.files[0];
     if(!file) return;
 
     const reader = new FileReader();
-
     reader.onload = ev=>{
       localStorage.setItem("logoNegocio",ev.target.result);
-      if(previewLogo){
-        previewLogo.src = ev.target.result;
-      }
+      previewLogo.src = ev.target.result;
     };
-
     reader.readAsDataURL(file);
-
   });
 
-  /* EVENTOS */
+  /* eventos */
 
   btnAgregar?.addEventListener("click",()=>{
-
     if(!negocioConfigurado()){
-      return mostrarAlerta("Completá el nombre del negocio y al menos una categoría.");
+      return mostrarAlerta("Primero completá el nombre del negocio");
     }
-
-    abrirModal(null);
-
+    abrirModal();
   });
 
-  btnGuardar?.addEventListener("click",onGuardarClick);
+  btnGuardar?.addEventListener("click",guardarProducto);
   btnCancelar?.addEventListener("click",cerrarModal);
 
-  imagen?.addEventListener("change",onImagenChange);
+  imagen?.addEventListener("change",previewImagen);
 
   modal?.addEventListener("click",e=>{
     if(e.target===modal) cerrarModal();
   });
 
-  document.addEventListener("keydown",e=>{
-    if(e.key==="Escape") cerrarModal();
-  });
-
-  filtro?.addEventListener("change",()=>{
-    renderProductos(obtenerListaFiltrada());
-    actualizarStats();
-  });
-
-  ordenSelect?.addEventListener("change",()=>{
-    renderProductos(obtenerListaFiltrada());
-  });
+  filtro?.addEventListener("change",()=>renderProductos(obtenerLista()));
+  ordenSelect?.addEventListener("change",()=>renderProductos(obtenerLista()));
 
   btnPDF?.addEventListener("click",generarPDF);
 
   btnLimpiar?.addEventListener("click",()=>{
-
-    if(!confirm("¿Borrar todos los productos?")) return;
-
+    if(!confirm("¿Eliminar todo?")) return;
     productos=[];
     categorias=[];
-
     saveState();
     poblarFiltros();
     renderProductos(productos);
     actualizarStats();
-    actualizarBoton();
-
   });
 
   btnBackup?.addEventListener("click",descargarBackup);
 
-  /* 🔥 FIX CATEGORÍAS */
+  /* 🔥 CATEGORÍAS CORREGIDO */
 
   btnAddCategoria?.addEventListener("click",()=>{
-
     const v = nuevaCategoriaInput.value.trim();
-
-    if(!v) return mostrarAlerta("Escribe el nombre de la categoría");
+    if(!v) return mostrarAlerta("Escribe una categoría");
 
     if(!categorias.includes(v)){
       categorias.push(v);
+      saveState();
     }
 
-    saveState();
-
-    poblarFiltros(); // 🔥 clave
-    poblarCategoriasEnModal();
-
+    poblarFiltros();
     nuevaCategoriaInput.value="";
     actualizarStats();
-    actualizarBoton();
-
   });
 
 });
-
-/* ---------- BOTÓN ---------- */
-
-function actualizarBoton(){
-  if(negocioConfigurado()){
-    btnAgregar?.removeAttribute("disabled");
-  }else{
-    btnAgregar?.setAttribute("disabled",true);
-  }
-}
 
 /* ---------- CATEGORIAS ---------- */
 
 function poblarFiltros(){
 
-  if(!filtro) return;
-
   filtro.innerHTML="";
 
-  const base = [
-    {value:"todas",text:"Todas las categorías"},
-    {value:"destacados",text:"Destacados"},
-    {value:"ofertas",text:"Ofertas"}
-  ];
-
-  base.forEach(o=>{
+  ["todas","destacados","ofertas"].forEach(v=>{
     const opt=document.createElement("option");
-    opt.value=o.value;
-    opt.textContent=o.text;
+    opt.value=v;
+    opt.textContent=v;
     filtro.appendChild(opt);
   });
 
@@ -227,15 +161,7 @@ function poblarFiltros(){
     filtro.appendChild(opt);
   });
 
-  poblarCategoriasEnModal();
-}
-
-function poblarCategoriasEnModal(){
-
-  if(!categoriaSelect) return;
-
   categoriaSelect.innerHTML="";
-
   categorias.forEach(cat=>{
     const opt=document.createElement("option");
     opt.value=cat;
@@ -251,97 +177,65 @@ function abrirModal(prod=null){
 
   editIndex=null;
 
-  modalTitulo.textContent=prod?"Editar producto":"Agregar producto";
-
   if(prod){
-
     nombre.value=prod.nombre;
     precio.value=prod.precio;
-    categoriaSelect.value=prod.categoria||"";
-
-    preview.src=prod.imagen||"";
-    preview.style.display=prod.imagen?"block":"none";
-
+    categoriaSelect.value=prod.categoria;
+    preview.src=prod.imagen;
+    preview.style.display="block";
     destacado.checked=prod.destacado;
     oferta.checked=prod.oferta;
-
-    editIndex=productos.findIndex(p=>p===prod);
-
   }else{
-
-    limpiarModalFields();
-    poblarCategoriasEnModal();
-
+    limpiarModal();
   }
 
   modal.classList.remove("oculto");
-  document.body.style.overflow="hidden";
-
 }
 
 function cerrarModal(){
-
   modal.classList.add("oculto");
-  document.body.style.overflow="auto";
-
-  limpiarModalFields();
-
-  editIndex=null;
-
+  limpiarModal();
 }
 
-function limpiarModalFields(){
-
+function limpiarModal(){
   nombre.value="";
   precio.value="";
-
-  if(categoriaSelect){
-    categoriaSelect.selectedIndex=0;
-  }
-
   imagen.value="";
   preview.src="";
   preview.style.display="none";
-
   destacado.checked=false;
   oferta.checked=false;
-
 }
 
 /* ---------- IMAGEN ---------- */
 
-function onImagenChange(e){
-
+function previewImagen(e){
   const file=e.target.files[0];
   if(!file) return;
 
   const reader=new FileReader();
-
   reader.onload=ev=>{
     preview.src=ev.target.result;
     preview.style.display="block";
   };
-
   reader.readAsDataURL(file);
-
 }
 
-/* ---------- GUARDAR ---------- */
+/* ---------- CRUD ---------- */
 
-function onGuardarClick(){
+function guardarProducto(){
 
-  if(!nombre.value.trim()) return mostrarAlerta("Completá el nombre");
-  if(!precio.value.trim()) return mostrarAlerta("Completá el precio");
-  if(!preview.src) return mostrarAlerta("Subí una imagen");
+  if(!nombre.value) return mostrarAlerta("Nombre requerido");
+  if(!precio.value) return mostrarAlerta("Precio requerido");
+  if(!preview.src) return mostrarAlerta("Imagen requerida");
 
-  const nuevo = {
-    nombre:nombre.value.trim(),
+  const nuevo={
+    nombre:nombre.value,
     precio:Number(precio.value),
     categoria:categoriaSelect.value,
     imagen:preview.src,
     destacado:destacado.checked,
-    oferta:oferta.checked,
-    id:Date.now()
+    oferta:oferta.checked
   };
 
   if(editIndex!==null){
@@ -351,35 +245,21 @@ function onGuardarClick(){
   }
 
   saveState();
-
-  renderProductos(obtenerListaFiltrada());
+  renderProductos(obtenerLista());
   actualizarStats();
-
   cerrarModal();
-
 }
 
 /* ---------- RENDER ---------- */
 
-function renderProductos(list = productos){
+function renderProductos(list){
 
-  contenedor.innerHTML = "";
-
-  if(list.length === 0){
-    contenedor.innerHTML = `
-      <div style="text-align:center;padding:40px;">
-        <h2>📦 No hay productos</h2>
-        <p>Agregá productos para crear tu catálogo</p>
-      </div>
-    `;
-    return;
-  }
+  contenedor.innerHTML="";
 
   list.forEach((p,i)=>{
 
-    const div = document.createElement("div");
-
-    div.className = "producto";
+    const div=document.createElement("div");
+    div.className="producto";
 
     if(p.destacado) div.classList.add("destacado");
     if(p.oferta) div.classList.add("oferta");
@@ -388,25 +268,21 @@ function renderProductos(list = productos){
     (p.destacado ? `<div class="badge destacado">⭐ Destacado</div>` : "") +
     (p.oferta ? `<div class="badge oferta">🔥 Oferta</div>` : "");
 
-    div.innerHTML = `
+    div.innerHTML=`
     ${badges}
     <img src="${p.imagen}">
     <h3>${p.nombre}</h3>
-    <p>${p.categoria || ""}</p>
+    <p>${p.categoria||""}</p>
     <p><b>$${p.precio}</b></p>
-    <div class="acciones no-imprimir">
-    <button onclick="onEditar(${i})">✏️</button>
-    <button onclick="onEliminar(${i})">🗑️</button>
+    <div class="acciones">
+      <button onclick="onEditar(${i})">✏️</button>
+      <button onclick="onEliminar(${i})">🗑️</button>
     </div>
     `;
 
     contenedor.appendChild(div);
-
   });
-
 }
-
-/* ---------- RESTO IGUAL ---------- */
 
 window.onEditar=i=>{
   editIndex=i;
@@ -414,15 +290,14 @@ window.onEditar=i=>{
 };
 
 window.onEliminar=i=>{
-  if(!confirm("Eliminar producto?")) return;
+  if(!confirm("Eliminar?")) return;
   productos.splice(i,1);
   saveState();
-  renderProductos(obtenerListaFiltrada());
+  renderProductos(obtenerLista());
   actualizarStats();
 };
 
-function obtenerListaFiltrada(){
-  if(!filtro) return productos;
+function obtenerLista(){
   const cat=filtro.value;
   if(cat==="todas") return productos;
   if(cat==="destacados") return productos.filter(p=>p.destacado);
@@ -430,4 +305,21 @@ function obtenerListaFiltrada(){
   return productos.filter(p=>p.categoria===cat);
 }
 
-/* ---------- PDF y BACKUP quedan igual ---------- */
+/* ---------- STATS ---------- */
+
+function actualizarStats(){
+  statTotal.textContent=productos.length;
+  statOfertas.textContent=productos.filter(p=>p.oferta).length;
+  statDestacados.textContent=productos.filter(p=>p.destacado).length;
+  statCategorias.textContent=categorias.length;
+}
+
+/* ---------- BACKUP ---------- */
+
+function descargarBackup(){
+  const blob=new Blob([JSON.stringify({productos,categorias})]);
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="backup.json";
+  a.click();
+}
