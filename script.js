@@ -323,3 +323,167 @@ function descargarBackup(){
   a.download="backup.json";
   a.click();
 }
+
+function generarPDF(){
+
+const lista = obtenerListaFiltrada();
+
+if(!lista.length){
+  return mostrarAlerta("No hay productos para generar el PDF.");
+}
+
+/* DATOS NEGOCIO */
+const nombreNegocio = localStorage.getItem("nombreNegocio") || "Mi Catálogo";
+const logoNegocio = localStorage.getItem("logoNegocio");
+
+/* AGRUPAR CATEGORIAS */
+const categoriasPDF = [...new Set(lista.map(p => p.categoria || "Sin categoría"))];
+
+/* CONTENEDOR */
+const pdfDiv = document.createElement("div");
+pdfDiv.style.fontFamily = "Arial";
+pdfDiv.style.padding = "20px";
+
+/* HEADER */
+const header = document.createElement("div");
+header.style.textAlign = "center";
+header.style.marginBottom = "20px";
+
+/* LOGO */
+if(logoNegocio){
+  const logo = document.createElement("img");
+  logo.src = logoNegocio;
+  logo.style.width = "80px";
+  logo.style.marginBottom = "10px";
+  header.appendChild(logo);
+}
+
+/* TITULO */
+const titulo = document.createElement("h1");
+titulo.textContent = nombreNegocio;
+titulo.style.margin = "0";
+titulo.style.fontSize = "22px";
+header.appendChild(titulo);
+
+/* FECHA */
+const fecha = document.createElement("p");
+fecha.textContent = "Generado: " + new Date().toLocaleString();
+fecha.style.fontSize = "12px";
+fecha.style.color = "#666";
+header.appendChild(fecha);
+
+pdfDiv.appendChild(header);
+
+/* CATEGORIAS */
+categoriasPDF.forEach(cat=>{
+
+  const tituloCat = document.createElement("h2");
+  tituloCat.textContent = cat;
+  tituloCat.style.background = "#0074D9";
+  tituloCat.style.color = "white";
+  tituloCat.style.padding = "6px";
+  tituloCat.style.borderRadius = "6px";
+  tituloCat.style.marginTop = "20px";
+
+  pdfDiv.appendChild(tituloCat);
+
+  const grid = document.createElement("div");
+  grid.style.display = "flex";
+  grid.style.flexWrap = "wrap";
+  grid.style.justifyContent = "center";
+
+  lista
+  .filter(p => (p.categoria || "Sin categoría") === cat)
+  .forEach(p=>{
+
+    const card = document.createElement("div");
+    card.style.width = "140px";
+    card.style.margin = "8px";
+    card.style.padding = "8px";
+    card.style.border = "1px solid #ddd";
+    card.style.borderRadius = "8px";
+    card.style.textAlign = "center";
+    card.style.background = "white";
+
+    /* BADGES */
+    if(p.destacado || p.oferta){
+
+      const badge = document.createElement("div");
+      badge.style.fontSize = "10px";
+      badge.style.fontWeight = "bold";
+      badge.style.marginBottom = "5px";
+
+      if(p.destacado){
+        badge.textContent = "⭐ DESTACADO";
+        badge.style.color = "#b58300";
+      }
+
+      if(p.oferta){
+        badge.textContent = "🔥 OFERTA";
+        badge.style.color = "#d9534f";
+      }
+
+      card.appendChild(badge);
+    }
+
+    /* IMAGEN */
+    const img = document.createElement("img");
+    img.src = p.imagen || "";
+    img.style.width = "100%";
+    img.style.height = "90px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "6px";
+
+    card.appendChild(img);
+
+    /* NOMBRE */
+    const nombre = document.createElement("div");
+    nombre.textContent = p.nombre;
+    nombre.style.fontWeight = "bold";
+    nombre.style.fontSize = "12px";
+    nombre.style.marginTop = "6px";
+
+    card.appendChild(nombre);
+
+    /* PRECIO */
+    const precio = document.createElement("div");
+    precio.textContent = "$" + p.precio;
+    precio.style.fontSize = "12px";
+
+    if(p.oferta){
+      precio.style.color = "#d9534f";
+    }
+
+    card.appendChild(precio);
+
+    grid.appendChild(card);
+
+  });
+
+  pdfDiv.appendChild(grid);
+
+});
+
+/* FOOTER */
+const pie = document.createElement("div");
+pie.style.marginTop = "20px";
+pie.style.textAlign = "center";
+pie.style.fontSize = "11px";
+pie.style.color = "#666";
+
+pie.textContent = "Total de productos: " + lista.length;
+
+pdfDiv.appendChild(pie);
+
+/* GENERAR PDF */
+html2pdf()
+.set({
+  margin: 0.3,
+  filename: nombreNegocio.replace(/\s+/g, "_") + ".pdf",
+  html2canvas: { scale: 2 },
+  jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+})
+.from(pdfDiv)
+.save();
+
+}
