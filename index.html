@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Catálogo PRO - CatálogoFácil</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CatálogoFácil PRO</title>
 
-<link rel="icon" href="logo.png"/>
-<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="style.css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -16,9 +15,9 @@
 <header class="header">
   <div class="header-left">
     <img src="logo.png" class="logo">
-    <div class="brand">
+    <div>
       <h1>CatálogoFácil PRO</h1>
-      <p class="tag">Tu catálogo listo en segundos</p>
+      <p>Tu catálogo listo en segundos</p>
     </div>
   </div>
 
@@ -26,50 +25,43 @@
 </header>
 
 <section class="config-negocio">
-  <div class="config-box">
-    <input id="nombreNegocio" class="input" placeholder="Nombre del negocio">
-    <input type="file" id="logoNegocio">
-    <img id="previewLogo" class="logo-preview">
-  </div>
+  <input id="nombreNegocio" placeholder="Nombre del negocio" class="input">
+
+  <input type="file" id="logoNegocio">
+  <img id="previewLogo" class="logo-preview">
 </section>
 
-<nav class="controls">
+<section class="controls">
 
   <div class="left-controls">
-    <button id="btnAgregar" class="btn primary">➕ Nuevo Producto</button>
+    <button id="btnAgregar" class="btn primary" disabled>➕ Nuevo Producto</button>
 
-    <div class="cat-row">
-      <select id="filtroCategoria" class="select"></select>
-      <input id="nuevaCategoria" class="input-small" placeholder="Nueva categoría">
-      <button id="btnAddCategoria" class="btn small">Agregar</button>
-    </div>
+    <select id="filtroCategoria" class="input"></select>
+
+    <input id="nuevaCategoria" placeholder="Nueva categoría" class="input">
+
+    <button id="btnAddCategoria" class="btn">Agregar</button>
   </div>
 
   <div class="right-controls">
-    <select id="orden" class="select">
-      <option value="default">Ordenar</option>
-      <option value="precio_asc">Precio ↑</option>
-      <option value="precio_desc">Precio ↓</option>
-    </select>
-
     <button id="btnPDF" class="btn accent">📄 PDF</button>
     <button id="btnLimpiar" class="btn outline">🧹 Limpiar</button>
   </div>
 
-</nav>
+</section>
 
 <section class="dashboard">
-  <div class="card-stat"><strong id="statTotal">0</strong>Productos</div>
-  <div class="card-stat"><strong id="statOfertas">0</strong>Ofertas</div>
-  <div class="card-stat"><strong id="statDestacados">0</strong>Destacados</div>
-  <div class="card-stat"><strong id="statCategorias">0</strong>Categorías</div>
+  <div><b id="statTotal">0</b> Productos</div>
+  <div><b id="statOfertas">0</b> Ofertas</div>
+  <div><b id="statDestacados">0</b> Destacados</div>
+  <div><b id="statCategorias">0</b> Categorías</div>
 </section>
 
 <section id="contenedorProductos" class="grid"></section>
 
 <!-- MODAL -->
 <div id="modal" class="modal oculto">
-  <div class="modal-contenido">
+  <div class="modal-box">
 
     <h2>Agregar producto</h2>
 
@@ -80,15 +72,18 @@
     <input id="imagen" type="file">
     <img id="preview">
 
-    <label><input type="checkbox" id="destacado"> Destacado</label>
-    <label><input type="checkbox" id="oferta"> Oferta</label>
+    <label><input type="checkbox" id="destacado"> ⭐ Destacado</label>
+    <label><input type="checkbox" id="oferta"> 🔥 Oferta</label>
 
-    <button id="guardar" class="btn primary">Guardar</button>
-    <button id="cancelar" class="btn outline">Cancelar</button>
+    <div class="modal-buttons">
+      <button id="guardar" class="btn primary">Guardar</button>
+      <button id="cancelar" class="btn outline">Cancelar</button>
+    </div>
 
   </div>
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
