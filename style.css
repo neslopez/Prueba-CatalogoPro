@@ -262,4 +262,12 @@ body{
 }
 
 /* DESKTOP */
-@media (min
+@media (min⁸
+
+        /* Botón deshabilitado */
+button:disabled {
+  background: #ccc !important;
+  color: #666 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
