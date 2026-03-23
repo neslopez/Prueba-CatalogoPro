@@ -14,136 +14,81 @@
 <body>
 
 <header class="header">
-<div class="header-left">
-<img src="logo.png" alt="logo" class="logo">
+  <div class="header-left">
+    <img src="logo.png" class="logo">
+    <div class="brand">
+      <h1>CatálogoFácil PRO</h1>
+      <p class="tag">Tu catálogo listo en segundos</p>
+    </div>
+  </div>
 
-<div class="brand">
-<h1>CatálogoFácil PRO</h1>
-<p class="tag">Tu catálogo listo en segundos</p>
-</div>
-</div>
-
-<div class="header-actions no-imprimir">
-<button id="btnBackup" class="btn">Backup</button>
-</div>
+  <button id="btnBackup" class="btn">Backup</button>
 </header>
 
-<section class="config-negocio no-imprimir">
-<div class="config-box">
-
-<label>Nombre del negocio</label>
-<input id="nombreNegocio" class="input" placeholder="Ej: Almacén Don Carlos">
-
-<label>Logo del negocio</label>
-<input type="file" id="logoNegocio" accept="image/*">
-
-<img id="previewLogo" class="logo-preview">
-
-</div>
+<section class="config-negocio">
+  <div class="config-box">
+    <input id="nombreNegocio" class="input" placeholder="Nombre del negocio">
+    <input type="file" id="logoNegocio">
+    <img id="previewLogo" class="logo-preview">
+  </div>
 </section>
 
-<nav class="controls no-imprimir">
+<nav class="controls">
 
-<div class="left-controls">
+  <div class="left-controls">
+    <button id="btnAgregar" class="btn primary">➕ Nuevo Producto</button>
 
-<button id="btnAgregar" class="btn primary">➕ Nuevo Producto</button>
+    <div class="cat-row">
+      <select id="filtroCategoria" class="select"></select>
+      <input id="nuevaCategoria" class="input-small" placeholder="Nueva categoría">
+      <button id="btnAddCategoria" class="btn small">Agregar</button>
+    </div>
+  </div>
 
-<label>Categoría</label>
+  <div class="right-controls">
+    <select id="orden" class="select">
+      <option value="default">Ordenar</option>
+      <option value="precio_asc">Precio ↑</option>
+      <option value="precio_desc">Precio ↓</option>
+    </select>
 
-<div class="cat-row">
-
-<select id="filtroCategoria" class="select"></select>
-
-<input id="nuevaCategoria" placeholder="Agregar categoría" class="input-small"/>
-
-<button id="btnAddCategoria" class="btn small">
-Agregar
-</button>
-
-</div>
-</div>
-
-<div class="right-controls">
-
-<label>Ordenar</label>
-
-<select id="orden" class="select">
-<option value="default">Por defecto</option>
-<option value="nombre_asc">Nombre ↑</option>
-<option value="nombre_desc">Nombre ↓</option>
-<option value="precio_asc">Precio ↑</option>
-<option value="precio_desc">Precio ↓</option>
-</select>
-
-<button id="btnPDF" class="btn accent">
-📄 Generar PDF
-</button>
-
-<button id="btnLimpiar" class="btn outline">
-🧹 Limpiar todo
-</button>
-
-</div>
+    <button id="btnPDF" class="btn accent">📄 PDF</button>
+    <button id="btnLimpiar" class="btn outline">🧹 Limpiar</button>
+  </div>
 
 </nav>
 
-<main>
-
-<section id="dashboard" class="dashboard no-imprimir">
-
-<div class="card-stat">
-<strong id="statTotal">0</strong>
-<span>Productos</span>
-</div>
-
-<div class="card-stat">
-<strong id="statOfertas">0</strong>
-<span>Ofertas</span>
-</div>
-
-<div class="card-stat">
-<strong id="statDestacados">0</strong>
-<span>Destacados</span>
-</div>
-
-<div class="card-stat">
-<strong id="statCategorias">0</strong>
-<span>Categorías</span>
-</div>
-
+<section class="dashboard">
+  <div class="card-stat"><strong id="statTotal">0</strong>Productos</div>
+  <div class="card-stat"><strong id="statOfertas">0</strong>Ofertas</div>
+  <div class="card-stat"><strong id="statDestacados">0</strong>Destacados</div>
+  <div class="card-stat"><strong id="statCategorias">0</strong>Categorías</div>
 </section>
 
 <section id="contenedorProductos" class="grid"></section>
 
-</main>
-
+<!-- MODAL -->
 <div id="modal" class="modal oculto">
+  <div class="modal-contenido">
 
-<div class="modal-contenido">
+    <h2>Agregar producto</h2>
 
-<h2>Agregar producto</h2>
+    <input id="nombre" placeholder="Nombre">
+    <input id="precio" type="number" placeholder="Precio">
+    <select id="categoria"></select>
 
-<input id="nombre" placeholder="Nombre" class="input"/>
-<input id="precio" type="number" placeholder="Precio" class="input"/>
-<select id="categoria" class="input"></select>
+    <input id="imagen" type="file">
+    <img id="preview">
 
-<input id="imagen" type="file"/>
-<img id="preview" class="preview">
+    <label><input type="checkbox" id="destacado"> Destacado</label>
+    <label><input type="checkbox" id="oferta"> Oferta</label>
 
-<label><input id="destacado" type="checkbox"> Destacado</label>
-<label><input id="oferta" type="checkbox"> Oferta</label>
+    <button id="guardar" class="btn primary">Guardar</button>
+    <button id="cancelar" class="btn outline">Cancelar</button>
 
-<button id="guardar" class="btn primary">Guardar</button>
-<button id="cancelar" class="btn outline">Cancelar</button>
-
+  </div>
 </div>
-</div>
-
-<footer class="footer no-imprimir">
-<small>CatálogoFácil PRO — Hecho por Ezequiel</small>
-</footer>
 
 <script src="script.js"></script>
-
 </body>
 </html>
