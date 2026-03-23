@@ -1,15 +1,140 @@
+:root{
+  --azul:#0074D9;
+  --amarillo:#FFCC00;
+  --gris:#f5f7fb;
+  --texto:#222;
+  --accent:#003f8a;
+  --danger:#d9534f;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Inter, system-ui;
+  background:var(--gris);
+  color:var(--texto);
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 20px;
+  background:white;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo{
+  width:50px;
+  height:auto;
+}
+
+.brand h1{
+  margin:0;
+  font-size:18px;
+  color:var(--azul);
+}
+
+.brand .tag{
+  font-size:12px;
+  color:#666;
+}
+
+/* CONFIG */
+.config-negocio{
+  padding:12px;
+  background:white;
+}
+
+.config-box{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.logo-preview{
+  height:40px;
+  width:auto;
+}
+
+/* CONTROLES */
+.controls{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:12px;
+  background:white;
+}
+
+.left-controls,
+.right-controls{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* BOTONES */
+.btn{
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  background:var(--azul);
+  color:white;
+  cursor:pointer;
+}
+
+.btn.primary{
+  background:var(--amarillo);
+  color:#222;
+}
+
+.btn.outline{
+  background:white;
+  color:var(--azul);
+  border:1px solid var(--azul);
+}
+
+.btn.accent{
+  background:var(--accent);
+}
+
+/* INPUTS */
+.input,
+.select,
+.input-small{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  width:100%;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  padding:10px;
+}
+
 .producto{
   background:white;
   border-radius:10px;
   padding:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.05);
   position:relative;
 }
 
-/* 🔥 FIX IMÁGENES */
 .producto img{
   width:100%;
-  height:150px;
+  height:140px;
   object-fit:cover;
   border-radius:6px;
 }
@@ -17,8 +142,8 @@
 /* BADGES */
 .badge{
   position:absolute;
-  top:10px;
-  left:10px;
+  top:8px;
+  left:8px;
   padding:5px 8px;
   border-radius:6px;
   font-size:12px;
@@ -32,20 +157,89 @@
 
 .badge.oferta{
   background:#d9534f;
-  color:#fff;
+  color:white;
 }
 
-/* GRID */
-.grid{
+/* DASHBOARD */
+.dashboard{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  grid-template-columns:1fr 1fr;
   gap:10px;
   padding:10px;
 }
 
-/* RESPONSIVE */
+.card-stat{
+  background:white;
+  padding:10px;
+  text-align:center;
+  border-radius:8px;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-contenido{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  width:90%;
+  max-width:400px;
+}
+
+.oculto{
+  display:none;
+}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:10px;
+  font-size:12px;
+  color:#666;
+}
+
+/* 🔥 DESKTOP (CLAVE) */
 @media(min-width:768px){
+
+  .controls{
+    flex-direction:row;
+    justify-content:space-between;
+  }
+
+  .left-controls,
+  .right-controls{
+    flex-direction:row;
+    align-items:center;
+  }
+
+  .config-box{
+    flex-direction:row;
+    align-items:center;
+  }
+
   .grid{
     grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   }
+
+  .dashboard{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .btn{
+    width:auto; /* 🔥 esto arregla TODO */
+  }
+
+  .input,
+  .select,
+  .input-small{
+    width:auto;
+  }
+
 }
