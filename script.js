@@ -3,8 +3,6 @@ let categorias = JSON.parse(localStorage.getItem("categorias")) || [];
 
 const $ = id => document.getElementById(id);
 
-const contenedor = $("contenedorProductos");
-
 document.addEventListener("DOMContentLoaded",()=>{
 
 cargarNegocio();
@@ -13,11 +11,11 @@ renderProductos();
 actualizarStats();
 
 $("btnAgregar").onclick=()=>abrirModal();
-$("cancelar").onclick=()=>cerrarModal();
+$("cancelar").onclick=cerrarModal;
 $("guardar").onclick=guardarProducto;
 $("imagen").onchange=previewImagen;
-$("btnPDF").onclick=generarPDF;
 $("btnAddCategoria").onclick=agregarCategoria;
+$("btnPDF").onclick=generarPDF;
 
 });
 
@@ -29,6 +27,7 @@ $("nombreNegocio").value = localStorage.getItem("nombreNegocio") || "";
 
 $("nombreNegocio").oninput=e=>{
 localStorage.setItem("nombreNegocio",e.target.value);
+verificarFlujo();
 };
 
 $("logoNegocio").onchange=e=>{
@@ -36,6 +35,7 @@ const reader=new FileReader();
 reader.onload=ev=>{
 localStorage.setItem("logoNegocio",ev.target.result);
 $("previewLogo").src=ev.target.result;
+verificarFlujo();
 };
 reader.readAsDataURL(e.target.files[0]);
 };
@@ -44,16 +44,34 @@ $("previewLogo").src = localStorage.getItem("logoNegocio") || "";
 
 }
 
+/* FLUJO */
+
+function verificarFlujo(){
+
+const nombre = localStorage.getItem("nombreNegocio");
+const logo = localStorage.getItem("logoNegocio");
+
+$("btnAgregar").disabled = !(nombre && logo && categorias.length>0);
+
+}
+
 /* CATEGORIAS */
 
 function agregarCategoria(){
+
 const val=$("nuevaCategoria").value.trim();
 if(!val) return;
 
 categorias.push(val);
+
 localStorage.setItem("categorias",JSON.stringify(categorias));
+
 poblarCategorias();
 actualizarStats();
+verificarFlujo();
+
+$("nuevaCategoria").value="";
+
 }
 
 function poblarCategorias(){
@@ -93,7 +111,8 @@ cerrarModal();
 
 function renderProductos(){
 
-contenedor.innerHTML="";
+const cont=$("contenedorProductos");
+cont.innerHTML="";
 
 productos.forEach((p,i)=>{
 
@@ -101,7 +120,7 @@ const badges =
 (p.destacado ? `<div class="badge destacado">⭐</div>` : "") +
 (p.oferta ? `<div class="badge oferta">🔥</div>` : "");
 
-contenedor.innerHTML+=`
+cont.innerHTML+=`
 <div class="producto ${p.destacado?'destacado':''} ${p.oferta?'oferta':''}">
 ${badges}
 <img src="${p.imagen}">
@@ -150,18 +169,35 @@ function generarPDF(){
 const nombre = localStorage.getItem("nombreNegocio") || "Catálogo";
 const logo = localStorage.getItem("logoNegocio");
 
-let html = `<h1>${nombre}</h1>`;
+let html = `<div style="text-align:center">`;
 
-if(logo) html += `<img src="${logo}" width="80">`;
+if(logo) html+=`<img src="${logo}" width="80"><br>`;
+html+=`<h1>${nombre}</h1></div>`;
 
-productos.forEach(p=>{
+const cats=[...new Set(productos.map(p=>p.categoria))];
+
+cats.forEach(cat=>{
+
+html+=`<h2>${cat}</h2><div style="display:flex;flex-wrap:wrap">`;
+
+productos.filter(p=>p.categoria===cat).forEach(p=>{
+
 html+=`
-<div>
-<h3>${p.nombre}</h3>
-<img src="${p.imagen}" width="100">
-<p>$${p.precio}</p>
+<div style="width:120px;margin:10px;text-align:center;border:1px solid #ccc;padding:5px">
+
+${p.destacado ? "⭐" : ""} ${p.oferta ? "🔥" : ""}
+
+<img src="${p.imagen}" style="width:100px;height:80px;object-fit:contain">
+<p>${p.nombre}</p>
+<b>$${p.precio}</b>
+
 </div>
 `;
+
+});
+
+html+=`</div>`;
+
 });
 
 html2pdf().from(html).save();
