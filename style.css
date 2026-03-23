@@ -326,3 +326,8 @@ button:disabled {
   }
 
 }
+
+/* 🔒 OCULTAR MODAL CORRECTAMENTE */
+.oculto{
+  display: none !important;
+}
