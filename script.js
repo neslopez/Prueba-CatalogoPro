@@ -1,212 +1,169 @@
-/* script limpio */
-
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 let categorias = JSON.parse(localStorage.getItem("categorias")) || [];
-
-let editIndex = null;
 
 const $ = id => document.getElementById(id);
 
 const contenedor = $("contenedorProductos");
-const filtro = $("filtroCategoria");
-const btnAgregar = $("btnAgregar");
-const btnPDF = $("btnPDF");
-const btnAddCategoria = $("btnAddCategoria");
-const nuevaCategoriaInput = $("nuevaCategoria");
 
-const modal = $("modal");
-const nombre = $("nombre");
-const precio = $("precio");
-const categoriaSelect = $("categoria");
-const imagen = $("imagen");
-const preview = $("preview");
-const destacado = $("destacado");
-const oferta = $("oferta");
-const btnGuardar = $("guardar");
-const btnCancelar = $("cancelar");
-
-const inputNombreNegocio = $("nombreNegocio");
-const inputLogoNegocio = $("logoNegocio");
-const previewLogo = $("previewLogo");
-
-/* INIT */
 document.addEventListener("DOMContentLoaded",()=>{
 
-poblarFiltros();
-renderProductos(productos);
+cargarNegocio();
+poblarCategorias();
+renderProductos();
+actualizarStats();
 
-const nombreGuardado = localStorage.getItem("nombreNegocio");
-const logoGuardado = localStorage.getItem("logoNegocio");
+$("btnAgregar").onclick=()=>abrirModal();
+$("cancelar").onclick=()=>cerrarModal();
+$("guardar").onclick=guardarProducto;
+$("imagen").onchange=previewImagen;
+$("btnPDF").onclick=generarPDF;
+$("btnAddCategoria").onclick=agregarCategoria;
 
-if(nombreGuardado) inputNombreNegocio.value = nombreGuardado;
-if(logoGuardado) previewLogo.src = logoGuardado;
-
-/* guardar negocio */
-inputNombreNegocio.addEventListener("input",()=>{
-localStorage.setItem("nombreNegocio",inputNombreNegocio.value);
 });
 
-inputLogoNegocio.addEventListener("change",(e)=>{
-const file = e.target.files[0];
-if(!file) return;
+/* NEGOCIO */
 
-const reader = new FileReader();
-reader.onload = ev=>{
-localStorage.setItem("logoNegocio",ev.target.result);
-previewLogo.src = ev.target.result;
+function cargarNegocio(){
+
+$("nombreNegocio").value = localStorage.getItem("nombreNegocio") || "";
+
+$("nombreNegocio").oninput=e=>{
+localStorage.setItem("nombreNegocio",e.target.value);
 };
-reader.readAsDataURL(file);
-});
 
-/* eventos */
-btnAgregar.addEventListener("click",abrirModal);
-btnGuardar.addEventListener("click",guardarProducto);
-btnCancelar.addEventListener("click",cerrarModal);
-imagen.addEventListener("change",previewImagen);
-btnPDF.addEventListener("click",generarPDF);
-
-btnAddCategoria.addEventListener("click",()=>{
-const v = nuevaCategoriaInput.value.trim();
-if(!v) return alert("Escribí una categoría");
-
-if(!categorias.includes(v)){
-categorias.push(v);
-localStorage.setItem("categorias",JSON.stringify(categorias));
-}
-
-poblarFiltros();
-nuevaCategoriaInput.value="";
-});
-
-});
-
-/* CATEGORIAS */
-function poblarFiltros(){
-
-filtro.innerHTML="";
-
-["todas","destacados","ofertas"].forEach(v=>{
-const opt=document.createElement("option");
-opt.value=v;
-opt.textContent=v;
-filtro.appendChild(opt);
-});
-
-categorias.forEach(cat=>{
-const opt=document.createElement("option");
-opt.value=cat;
-opt.textContent=cat;
-filtro.appendChild(opt);
-});
-
-categoriaSelect.innerHTML="";
-categorias.forEach(cat=>{
-const opt=document.createElement("option");
-opt.value=cat;
-opt.textContent=cat;
-categoriaSelect.appendChild(opt);
-});
-
-}
-
-/* MODAL */
-function abrirModal(){
-modal.classList.remove("oculto");
-}
-
-function cerrarModal(){
-modal.classList.add("oculto");
-}
-
-/* IMAGEN */
-function previewImagen(e){
-const file=e.target.files[0];
+$("logoNegocio").onchange=e=>{
 const reader=new FileReader();
 reader.onload=ev=>{
-preview.src=ev.target.result;
+localStorage.setItem("logoNegocio",ev.target.result);
+$("previewLogo").src=ev.target.result;
 };
-reader.readAsDataURL(file);
+reader.readAsDataURL(e.target.files[0]);
+};
+
+$("previewLogo").src = localStorage.getItem("logoNegocio") || "";
+
 }
 
-/* CRUD */
+/* CATEGORIAS */
+
+function agregarCategoria(){
+const val=$("nuevaCategoria").value.trim();
+if(!val) return;
+
+categorias.push(val);
+localStorage.setItem("categorias",JSON.stringify(categorias));
+poblarCategorias();
+actualizarStats();
+}
+
+function poblarCategorias(){
+
+$("categoria").innerHTML="";
+$("filtroCategoria").innerHTML="";
+
+categorias.forEach(c=>{
+$("categoria").innerHTML+=`<option>${c}</option>`;
+$("filtroCategoria").innerHTML+=`<option>${c}</option>`;
+});
+
+}
+
+/* PRODUCTOS */
+
 function guardarProducto(){
 
 const nuevo={
-nombre:nombre.value,
-precio:Number(precio.value),
-categoria:categoriaSelect.value,
-imagen:preview.src,
-destacado:destacado.checked,
-oferta:oferta.checked
+nombre:$("nombre").value,
+precio:$("precio").value,
+categoria:$("categoria").value,
+imagen:$("preview").src,
+destacado:$("destacado").checked,
+oferta:$("oferta").checked
 };
 
 productos.push(nuevo);
+
 localStorage.setItem("productos",JSON.stringify(productos));
 
-renderProductos(productos);
+renderProductos();
+actualizarStats();
 cerrarModal();
+
 }
 
-/* RENDER */
-function renderProductos(list){
+function renderProductos(){
 
 contenedor.innerHTML="";
 
-list.forEach((p,i)=>{
-
-const div=document.createElement("div");
-div.className="producto";
+productos.forEach((p,i)=>{
 
 const badges =
 (p.destacado ? `<div class="badge destacado">⭐</div>` : "") +
 (p.oferta ? `<div class="badge oferta">🔥</div>` : "");
 
-div.innerHTML=`
+contenedor.innerHTML+=`
+<div class="producto ${p.destacado?'destacado':''} ${p.oferta?'oferta':''}">
 ${badges}
 <img src="${p.imagen}">
 <h3>${p.nombre}</h3>
 <p>$${p.precio}</p>
+</div>
 `;
-
-contenedor.appendChild(div);
 
 });
 
+}
+
+/* MODAL */
+
+function abrirModal(){
+$("modal").classList.remove("oculto");
+}
+
+function cerrarModal(){
+$("modal").classList.add("oculto");
+}
+
+/* IMAGEN */
+
+function previewImagen(e){
+const reader=new FileReader();
+reader.onload=ev=>{
+$("preview").src=ev.target.result;
+};
+reader.readAsDataURL(e.target.files[0]);
+}
+
+/* STATS */
+
+function actualizarStats(){
+$("statTotal").textContent=productos.length;
+$("statOfertas").textContent=productos.filter(p=>p.oferta).length;
+$("statDestacados").textContent=productos.filter(p=>p.destacado).length;
+$("statCategorias").textContent=categorias.length;
 }
 
 /* PDF */
+
 function generarPDF(){
 
-const lista = productos;
+const nombre = localStorage.getItem("nombreNegocio") || "Catálogo";
+const logo = localStorage.getItem("logoNegocio");
 
-if(!lista.length){
-return alert("No hay productos");
-}
+let html = `<h1>${nombre}</h1>`;
 
-const nombreNegocio = localStorage.getItem("nombreNegocio") || "Catálogo";
-const logoNegocio = localStorage.getItem("logoNegocio");
+if(logo) html += `<img src="${logo}" width="80">`;
 
-const pdfDiv = document.createElement("div");
-
-/* HEADER */
-if(logoNegocio){
-const img=document.createElement("img");
-img.src=logoNegocio;
-img.style.width="80px";
-pdfDiv.appendChild(img);
-}
-
-const titulo=document.createElement("h1");
-titulo.textContent=nombreNegocio;
-pdfDiv.appendChild(titulo);
-
-/* PRODUCTOS */
-lista.forEach(p=>{
-const div=document.createElement("div");
-div.textContent=p.nombre + " - $" + p.precio;
-pdfDiv.appendChild(div);
+productos.forEach(p=>{
+html+=`
+<div>
+<h3>${p.nombre}</h3>
+<img src="${p.imagen}" width="100">
+<p>$${p.precio}</p>
+</div>
+`;
 });
 
-html2pdf().from(pdfDiv).save("catalogo.pdf");
+html2pdf().from(html).save();
 
 }
